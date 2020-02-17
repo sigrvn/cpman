@@ -7,6 +7,7 @@
 #include <QClipboard>
 #include <QProcess>
 
+class QLabel;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
@@ -32,6 +33,7 @@ class Cpman : public QWidget
         QAction *quitAction;
 
         QClipboard *clipboard_;
+        QLabel *label_;
         QLineEdit *lineEdit_;
         QListWidget *list_;
         QList<QListWidgetItem*> items;
