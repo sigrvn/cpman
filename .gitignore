@@ -1,4 +1,5 @@
 .vscode
+/bin
 
 # C++ objects and libs
 *.slo

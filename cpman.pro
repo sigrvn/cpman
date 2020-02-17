@@ -22,5 +22,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += cpman.h
-SOURCES += cpman.cpp main.cpp
+HEADERS += src/cpman.h
+SOURCES += src/cpman.cpp src/main.cpp

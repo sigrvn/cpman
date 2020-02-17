@@ -1,3 +1,3 @@
-# ![alt-text](/assets/favicon-32x32.png) cpman
+# ![alt-text](/assets/appicon-16x16.png) cpman
 
-A simple clipboard management tool built with Qt.
+A simple, cross-platform clipboard management tool built with Qt.

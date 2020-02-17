@@ -7,7 +7,9 @@
 #include <QClipboard>
 #include <QProcess>
 
-class QTextBrowser;
+class QLineEdit;
+class QListWidget;
+class QListWidgetItem;
 
 class Cpman : public QWidget
 {
@@ -19,19 +21,20 @@ class Cpman : public QWidget
 
     private slots:
         void addToClipboard();
-        void showFullClipboard();
-        void iconActivated(QSystemTrayIcon::ActivationReason reason);
+        void filterItems();
 
     private:
+        void createSystemTray();
+        void createMainUI();
         QSystemTrayIcon *trayIcon_;
         QMenu *trayMenu_;
-
         QAction *showFullAction;
+        QAction *quitAction;
 
         QClipboard *clipboard_;
-        QTextBrowser *textBrowser_;
-
-        std::vector<QString> items;
+        QLineEdit *lineEdit_;
+        QListWidget *list_;
+        QList<QListWidgetItem*> items;
 };
 
 #endif
