@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Cpman c;
-    c.hide();
+    c.registerHotkeys(a);
+    c.show(); // default to hide
 
     return a.exec();
 }

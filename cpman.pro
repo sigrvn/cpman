@@ -24,3 +24,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # Input
 HEADERS += src/cpman.h
 SOURCES += src/cpman.cpp src/main.cpp
+
+include(vendor/vendor.pri)

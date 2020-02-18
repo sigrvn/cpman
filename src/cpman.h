@@ -1,13 +1,12 @@
 #ifndef CPMAN_H
 #define CPMAN_H
 
-#include <QWidget>
-#include <QSystemTrayIcon>
-#include <QMenu>
-#include <QClipboard>
-#include <QProcess>
+#include <QtWidgets>
+#include <QString>
+#include <QHotkey>
 
-class QLabel;
+class QSystemTrayIcon;
+class QMenu;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
@@ -20,20 +19,24 @@ class Cpman : public QWidget
         explicit Cpman(QWidget *parent = 0);
         ~Cpman();
 
+        void registerHotkeys(QApplication &a);
+
     private slots:
+        //void pasteItem();
         void addToClipboard();
         void filterItems();
 
     private:
         void createSystemTray();
         void createMainUI();
+
         QSystemTrayIcon *trayIcon_;
         QMenu *trayMenu_;
-        QAction *showFullAction;
+        QAction *showAction;
+        QAction *filterAction;
         QAction *quitAction;
 
         QClipboard *clipboard_;
-        QLabel *label_;
         QLineEdit *lineEdit_;
         QListWidget *list_;
         QList<QListWidgetItem*> items;
