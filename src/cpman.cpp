@@ -18,12 +18,10 @@ Cpman::Cpman(QWidget *parent) : QWidget(parent, Qt::FramelessWindowHint)
     this->setContentsMargins(0,0,0,0);
     this->layout()->setContentsMargins(0,1,0,0);
 
-    connect(trayIcon_, &QSystemTrayIcon::activated, this, [=]() { 
-        trayMenu_->show(); 
-    });
+    connect(trayIcon_, &QSystemTrayIcon::activated, this, [=]() { trayMenu_->show(); });
 
-    // NOTE: Due to a Chromium bug, text copied from Chromium address bars fire dataChanged signal twice
     connect(clipboard_, &QClipboard::dataChanged, this, &Cpman::addToClipboard);
+
 }
 
 Cpman::~Cpman()
@@ -48,6 +46,7 @@ void Cpman::addToClipboard()
     }
 
     QListWidgetItem *newItem = new QListWidgetItem(str);
+    newItem->setSizeHint(QSize(newItem->sizeHint().width(), 20));
 
     items.push_back(newItem);
     list_->addItem(newItem);
@@ -91,30 +90,26 @@ void Cpman::createSystemTray()
     trayIcon_->setVisible(true);
     trayIcon_->show();
 
-    // Menu Actions for SysTray
     trayMenu_ = new QMenu();
 
-    showAction = new QAction(tr("Show Clipboard"));
-    showAction->setShortcut(QKeySequence("ctrl+H"));
-    connect(showAction, &QAction::triggered, this, [=]() { 
-        this->show(); 
-    });
+    showAction = new QAction(tr("Toggle Clipboard"), this);
+    connect(showAction, &QAction::triggered, this, [=]() { toggleVisibility(); });
+    this->addAction(showAction);
+    trayMenu_->addAction(showAction);
 
-    filterAction = new QAction(tr("Filter/Find"));
-    filterAction->setShortcut(QKeySequence("ctrl+F"));
+    filterAction = new QAction(tr("Filter/Find"), this);
+    filterAction->setShortcut(Qt::Key_F | Qt::CTRL);
     connect(filterAction, &QAction::triggered, this, [=]() {
         if (!lineEdit_->isVisible()) lineEdit_->setVisible(true);
         else lineEdit_->setVisible(false);
     });
-
-    quitAction = new QAction(tr("Quit cpman"));
-    quitAction->setShortcut(QKeySequence("ctrl+Q"));
-    connect(quitAction, &QAction::triggered, this, [=]() { 
-        qApp->quit(); 
-    });
-
-    trayMenu_->addAction(showAction);
+    this->addAction(filterAction);
     trayMenu_->addAction(filterAction);
+
+    quitAction = new QAction(tr("Quit cpman"), this);
+    quitAction->setShortcut(Qt::Key_Q | Qt::CTRL);
+    connect(quitAction, &QAction::triggered, this, [=]() { qApp->quit(); });
+    this->addAction(quitAction);
     trayMenu_->addAction(quitAction);
 
     trayIcon_->setContextMenu(trayMenu_);
@@ -131,6 +126,7 @@ void Cpman::createMainUI()
 
     list_ = new QListWidget(this);
 
+    // Create SignalMapper here
     connect(list_, &QListWidget::itemDoubleClicked, this, [=](QListWidgetItem *item) { 
         clipboard_->setText(item->text());
     });
@@ -147,29 +143,26 @@ void Cpman::createMainUI()
     }
 }
 
+void Cpman::toggleVisibility()
+{
+    if (!this->isVisible())
+    {
+        QPoint globalCursorPos = QCursor::pos();
+        this->move(globalCursorPos);
+        this->show();
+    }
+
+    else 
+    {
+        this->hide();
+    }
+}
+
 void Cpman::registerHotkeys(QApplication &a)
 {
     auto quitHotkey = new QHotkey(QKeySequence("ctrl+alt+Q"), true, &a);
-
-    connect(quitHotkey, &QHotkey::activated, qApp, [&](){
-        qApp->quit();
-    });
+    connect(quitHotkey, &QHotkey::activated, qApp, [&](){ qApp->quit(); });
 
     auto toggleHotkey = new QHotkey(QKeySequence("ctrl+alt+A"), true, &a);
-
-    connect(toggleHotkey, &QHotkey::activated, qApp, [&](){
-        if (!this->isVisible()) {
-            QPoint globalCursorPos = QCursor::pos();
-
-            int mouseScreen = qApp->desktop()->screenNumber(globalCursorPos);
-            qDebug().nospace() << "Showing app at " << mouseScreen;
-
-            this->move(globalCursorPos);
-            this->show();
-        }
-        else {
-            qDebug().nospace() << "Hiding app";
-            this->hide();
-        }
-    });
-}   
+    connect(toggleHotkey, &QHotkey::activated, qApp, [&]() { toggleVisibility(); } );
+}  

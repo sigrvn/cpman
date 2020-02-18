@@ -22,13 +22,13 @@ class Cpman : public QWidget
         void registerHotkeys(QApplication &a);
 
     private slots:
-        //void pasteItem();
         void addToClipboard();
         void filterItems();
 
     private:
         void createSystemTray();
         void createMainUI();
+        void toggleVisibility();
 
         QSystemTrayIcon *trayIcon_;
         QMenu *trayMenu_;
@@ -40,6 +40,25 @@ class Cpman : public QWidget
         QLineEdit *lineEdit_;
         QListWidget *list_;
         QList<QListWidgetItem*> items;
+
+        QPoint mpos;
+
+    protected:
+        void mousePressEvent(QMouseEvent *event) override
+        {
+            mpos = event->pos();
+        }
+
+        void mouseMoveEvent(QMouseEvent *event) override
+        {
+            if(event->buttons() & Qt::LeftButton)
+            {
+                QPoint diff = event->pos() - mpos;
+                QPoint newpos = this->pos() + diff;
+
+                this->move(newpos);
+            }
+        }
 };
 
 #endif

@@ -1,4 +1,11 @@
 QWidget
 {
-    background-color: #F9E5BC;
+    color: #F9E5BC;
+    background-color: #002b36;
+}
+
+QScrollBar 
+{
+    height: 0px;
+    width: 0px;
 }
