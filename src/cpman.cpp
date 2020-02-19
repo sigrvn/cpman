@@ -14,12 +14,11 @@ Cpman::Cpman(QWidget *parent) : QWidget(parent, Qt::FramelessWindowHint)
     this->setLayout(mainLayout);
     this->setWindowTitle(tr("cpman"));
 
-    // Borderless base widget with no margins
+    // Borderless base widget with 20px top margin to drag window
     this->setContentsMargins(0,0,0,0);
-    this->layout()->setContentsMargins(0,1,0,0);
+    this->layout()->setContentsMargins(0,20,0,0);
 
     connect(trayIcon_, &QSystemTrayIcon::activated, this, [=]() { trayMenu_->show(); });
-
     connect(clipboard_, &QClipboard::dataChanged, this, &Cpman::addToClipboard);
 
 }
@@ -40,44 +39,30 @@ void Cpman::addToClipboard()
     qDebug().nospace() << "copied " << qPrintable(str);
 
     // Don't add repeats
-    for (int i = 0; i < items.size(); ++i)
-    {
-        if (items.at(i)->text() == str) return;
-    }
+    if(items.contains(str)) return;
 
     QListWidgetItem *newItem = new QListWidgetItem(str);
     newItem->setSizeHint(QSize(newItem->sizeHint().width(), 20));
 
-    items.push_back(newItem);
+    items.append(str);
     list_->addItem(newItem);
 }
 
 void Cpman::filterItems()
 {
     QString query = lineEdit_->text();
-    if (query.isEmpty() && list_->count() > 0)
+    QRegExp regExp(query, Qt::CaseInsensitive, QRegExp::Wildcard);
+    if (query.isEmpty())
     {
-        qDebug().nospace() << "refreshing list";
-        for (auto &item : items)
-        {
-            item->setHidden(false);
-        }
+        list_->clear();
+        list_->addItems(items);
         return;
     }
 
-    auto filteredList = list_->findItems(query, Qt::MatchContains);
-
-    for (int i = 0; i < filteredList.size(); ++i)
+    if(list_->count() > 0)
     {
-        qDebug().nospace() << filteredList.at(i)->text();
-        for (int j = 0; j < items.size(); ++j)
-        {
-            if (filteredList.at(i)->text() != items.at(j)->text())
-            {
-                qDebug().nospace() << "setting " << items.at(j)->text() << " to hidden";
-                items.at(j)->setHidden(true);
-            }
-        }
+        list_->clear();
+        list_->addItems(items.filter(regExp));
     }
 }
 
@@ -150,12 +135,7 @@ void Cpman::toggleVisibility()
         QPoint globalCursorPos = QCursor::pos();
         this->move(globalCursorPos);
         this->show();
-    }
-
-    else 
-    {
-        this->hide();
-    }
+    } else this->hide();
 }
 
 void Cpman::registerHotkeys(QApplication &a)

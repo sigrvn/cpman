@@ -39,7 +39,7 @@ class Cpman : public QWidget
         QClipboard *clipboard_;
         QLineEdit *lineEdit_;
         QListWidget *list_;
-        QList<QListWidgetItem*> items;
+        QStringList items;
 
         QPoint mpos;
 
